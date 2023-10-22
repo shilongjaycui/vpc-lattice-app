@@ -7,6 +7,7 @@ project = AwsCdkPythonApp(
     module_name="vpc_lattice_app",
     name="vpc-lattice-app",
     version="0.1.0",
+    deps=["pytest"]
 )
 
 project.synth()

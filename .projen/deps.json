@@ -17,6 +17,10 @@
     },
     {
       "name": "pytest",
+      "type": "runtime"
+    },
+    {
+      "name": "pytest",
       "version": "6.2.1",
       "type": "test"
     }
