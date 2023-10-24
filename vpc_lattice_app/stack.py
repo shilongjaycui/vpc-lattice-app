@@ -1,10 +1,6 @@
-from typing import List
-
 import aws_cdk as cdk
 import aws_cdk.aws_lambda as lambda_
-import aws_cdk.aws_sns as sns
-import aws_cdk.aws_sns_subscriptions as sns_subscriptions
-import aws_cdk.aws_stepfunctions as sfn
+from aws_cdk.aws_ec2 import Vpc
 
 from constructs import Construct
 
@@ -14,31 +10,30 @@ class StateMachineStack(cdk.Stack):
 			self,
 			scope: Construct,
 			construct_id: str,
-			*,
-			topics: List[sns.Topic],
-			**kwargs
+			**kwargs,
 	) -> None:
 		super().__init__(scope, construct_id, **kwargs)
-		# The code that defines your stack goes here
 
-		# In the future this state machine will do some work...
-		state_machine: sfn.StateMachine = sfn.StateMachine(
-            self, "StateMachine", definition=sfn.Pass(self, "StartState")
-        )
-
-        # This Lambda function starts the state machine.
+        # This Lambda function says hello.
 		lambda_function: lambda_.Function = lambda_.Function(
             self,
             "LambdaFunction",
             runtime=lambda_.Runtime.PYTHON_3_11,
             handler="handler",
             code=lambda_.Code.from_asset("../lambda"),
-            environment={
-                "STATE_MACHINE_ARN": state_machine.state_machine_arn,
-            },
         )
-		state_machine.grant_start_execution(lambda_function)
 
-		subscription: sns_subscriptions.LambdaSubscription = sns_subscriptions.LambdaSubscription(lambda_function)
-		for topic in topics:
-			topic.add_subscription(subscription)
+		"""
+		TODO: configure the following for the VPC
+			- IP address range
+			- subnets
+				- must be connected to a network access control list, which allows
+					inbound and outbound traffic
+				- route tables
+					- must have a route to the internet gateway below
+			- internet gateways
+			- security groups
+		
+		"""
+		billing_vpc: Vpc = Vpc()
+		parking_vpc: Vpc = Vpc()
